@@ -1,0 +1,56 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      PORT: "3001"
+      TODO_DB_PATH: /app/backend/data/todos.sqlite
+      CORS_ORIGIN: http://frontend:8080,http://localhost:8080,http://127.0.0.1:8080
+    volumes:
+      - todo_data:/app/backend/data
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  tests:
+    image: mcr.microsoft.com/playwright:v1.54.2-jammy
+    profiles: ["test"]
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    command: >
+      bash -lc "
+      npm install &&
+      npm run test &&
+      PLAYWRIGHT_BASE_URL=http://frontend:8080 npx playwright test
+      "
+
+volumes:
+  todo_data:

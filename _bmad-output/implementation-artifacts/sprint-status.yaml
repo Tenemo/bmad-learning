@@ -1,0 +1,23 @@
+epic_status:
+  epic-1: in-progress
+  epic-2: backlog
+  epic-3: backlog
+  epic-4: backlog
+story_status:
+  1.1: done
+  1.2: done
+  2.1: backlog
+  2.2: backlog
+  2.3: backlog
+  3.1: backlog
+  3.2: backlog
+  3.3: backlog
+  3.4: backlog
+  4.1: backlog
+  4.2: backlog
+  4.3: backlog
+current_story: "2.1"
+notes:
+  - BMAD setup is complete
+  - planning artifacts are present
+  - implementation starts with backend persistence and health checks
